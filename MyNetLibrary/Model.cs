@@ -7,19 +7,23 @@
     {
         private IList<Layer> layers;
         private float eta;
-        private float lastError;
         private float[][] momentum;
+        private float lastError;
         public float? TargetError { get; set; }
         public float? MinDW { get; set; }
         public bool Random { get; set; }
         public int? BatchSize { get; set; }
-        public IRegularizer Regularizer { get; set; }
         public float MomentumCoefficient { get; set; }
+        public int ErrorListLength { get; set; }
+        public List<float> ErrorList { get; private set; }
+        public float LambdaReg { get; set; }
 
         public Model()
         {
             layers = new List<Layer>();
             MomentumCoefficient = 0.1f;
+            ErrorListLength = 500;
+            ErrorList = new List<float>(ErrorListLength);
         }
 
         public void Train(int maxN, float eta, Func<int, IList<float>> getXFunc, Func<int, IList<float>> getYFunc)
@@ -133,7 +137,6 @@
             GetRes(X);
             float[] dels;
             float[] delsOld = null;
-            float regulation;
             float temp;
             momentum = new float[layers.Count][];
 
@@ -144,18 +147,23 @@
             }
 
             lastError = (float)error / Y.Count;
+            ErrorList.Add(lastError);
+            if (ErrorList.Count > ErrorListLength)
+            {
+                ErrorList.RemoveRange(0, ErrorList.Count - ErrorListLength);
+            }
+
             for (int i = layers.Count - 1; i >= 0; i--)
             {
                 dels = new float[layers[i].M];
                 momentum[i] = new float[dels.Length];
-                regulation = (Regularizer == null) ? 0.0f : Regularizer.GetReg(layers[i]);
 
                 for (int j = 0; j < dels.Length; j++)
                 {
                     sum = 0;
                     if (i == layers.Count - 1)
                     {
-                        dels[j] = (Y[j] - layers[i].Y[j] + regulation) * layers[i].Function.DerivativeactivationFunction(layers[i].Ysum[j]);
+                        dels[j] = (Y[j] - layers[i].Y[j]) * layers[i].Function.DerivativeactivationFunction(layers[i].Ysum[j]);
                     }
                     else
                     {
@@ -164,17 +172,17 @@
                             sum += layers[i + 1].W[k, j] * delsOld[k];
                         }
 
-                        dels[j] = (sum + regulation) * layers[i].Function.DerivativeactivationFunction(layers[i].Ysum[j]);
+                        dels[j] = sum * layers[i].Function.DerivativeactivationFunction(layers[i].Ysum[j]);
                     }
 
                     for (int k = 0; k < layers[i].N; k++)
                     {
                         temp = layers[i].X[k] * eta * dels[j];
-                        layers[i].Wn[j, k] += temp + (MomentumCoefficient * momentum[i][j]);
+                        layers[i].Wn[j, k] += temp - (LambdaReg * layers[i].Wn[j, k]) + (MomentumCoefficient * momentum[i][j]);
                         momentum[i][j] = temp;
                     }
 
-                    layers[i].Wn0[j] += eta * dels[j];
+                    layers[i].Wn0[j] += eta * dels[j] - (LambdaReg * layers[i].Wn0[j]);
                 }
 
                 delsOld = dels;

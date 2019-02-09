@@ -4,7 +4,7 @@
     using System.IO;
     using System.Text;
 
-    internal abstract class ModelSaveLoadHandler
+    internal abstract class ModelSaveLoader
     {
         internal static void SaveWeights(IList<Layer> layers, string path)
         {

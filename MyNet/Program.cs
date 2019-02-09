@@ -32,11 +32,13 @@
                 new List<float> { 0.0f }
             };
 
-            model.TargetError = 0.0000001f;
-            model.MomentumCoefficient = 0f;
+            model.TargetError = null;
+            model.MinDW = null;
+            model.MomentumCoefficient = 0.0f;
+            Console.WriteLine(model.MomentumCoefficient);
 
-            model.Regularizer = null;
-            //model.Regularizer = new LenReg(0.5f, 0.0006f); //работает? да ну бред
+            //model.Regularizer = null;
+            model.Regularizer = new LenReg(0.5f, 0.0006f); //работает? да ну бред
 
             //model.AddLayer(new Layer(1, 1, Layer.FunctionType.BynarySigmoid));
             //List<List<float>> outL = new List<List<float>>(10);
@@ -65,6 +67,7 @@
             //Func<int, IList<float>> fOut = (x => x >= outL.Count ? null : outL[x]);
 
             //model.Random = false;
+            //model.BatchSize = 100;
             //Func<int, IList<float>> fInp = (x => x >= inp.Count ? null : inp[x]);
             //Func<int, IList<float>> fOut = (x => x >= outL.Count ? null : outL[x]);
 
@@ -72,7 +75,7 @@
             Func<int, IList<float>> fInp = (x => inp[x % inp.Count]);
             Func<int, IList<float>> fOut = (x => outL[x % outL.Count]);
 
-            model.Train(10000000, 0.001f, fInp, fOut);
+            model.Train(1000000, 0.01f, fInp, fOut);
             //model.Load("res.txt");
 
             Console.WriteLine("TRAIN DONE");

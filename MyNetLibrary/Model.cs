@@ -28,6 +28,7 @@
             int n;
             IList<float> inp = null;
             IList<float> outp = null;
+            float dW;
 
             if (Random)
             {
@@ -36,7 +37,8 @@
                 {
                     n = rand.Next();
                     TrainStep(getXFunc(n), getYFunc(n));
-                    if (MinDW != null && SetNewW() < MinDW)
+                    dW = SetNewW();
+                    if (MinDW != null && dW < MinDW)
                     {
                         return;
                     }
@@ -59,7 +61,7 @@
                         TrainStep(inp, outp);
                         if (TargetError != null && TargetError > lastError)
                         {
-							SetNewW();
+                            SetNewW();
                             return;
                         }
 
@@ -67,7 +69,8 @@
                         i++;
                         if (BatchSize != null && i % BatchSize == 0)
                         {
-                            if (MinDW != null && SetNewW() < MinDW)
+                            dW = SetNewW();
+                            if (MinDW != null && dW < MinDW)
                             {
                                 return;
                             }
@@ -77,7 +80,8 @@
                         outp = getYFunc(n);
                     }
                     while (i < maxN && inp != null && outp != null);
-                    if (MinDW != null && SetNewW() < MinDW)
+                    dW = SetNewW();
+                    if (MinDW != null && dW < MinDW)
                     {
                         return;
                     }
@@ -104,12 +108,12 @@
 
         public void SaveWeights(string path)
         {
-            ModelSaveLoadHandler.SaveWeights(layers, path);
+            ModelSaveLoader.SaveWeights(layers, path);
         }
 
         public void LoadWeights(string path)
         {
-            ModelSaveLoadHandler.LoadWeights(layers, path);
+            ModelSaveLoader.LoadWeights(layers, path);
         }
 
         private float SetNewW()

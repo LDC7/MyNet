@@ -24,4 +24,4 @@ float GyperTanFun(float x) { return (((std::expf(2.0f * x) - 1.0f) / (std::expf(
 float DerGyperTanFun(float x) { return (1.0f - powf(GyperTanFun(x), 2.0f)); }
 
 float ReLuFun(float x) { return x > 0.0f ? x : 0.0f; }
-float DerReLuFun(float x) { logf(1.0f + std::expf(x)); } // приближение
+float DerReLuFun(float x) { return logf(1.0f + std::expf(x)); } // приближение

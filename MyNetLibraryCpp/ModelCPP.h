@@ -5,10 +5,12 @@ class ModelCPP
 {
 public:
 	ModelCPP();
-	
-	void Train(int maxN, float eta, float*(*getXFunc)(int, int*), float*(*getYFunc)(int, int*));
 
-	void AddLayer(LayerCPP layer);
+	~ModelCPP();
+	
+	void Train(int maxN, float eta, float*(*getXFunc)(int), float*(*getYFunc)(int));
+
+	void AddLayer(LayerCPP* layer);
 
 	float* GetRes(float* input);
 
@@ -35,7 +37,7 @@ public:
 	list<float> GetErrorList();
 
 private:
-	list<LayerCPP> layers;
+	list<LayerCPP*> layers;
 	int layersCount = 0;
 	float eta;
 	float** momentum;

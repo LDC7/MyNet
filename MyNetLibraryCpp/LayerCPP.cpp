@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "LayerCPP.h"
 
-LayerCPP::LayerCPP(int nEnters, int nExits, FunctionTypeCPP activationFun)
+LayerCPP::LayerCPP(int nEnters, int nExits, FunctionWrapperCPP* activationFun)
 {
 	SetN(nEnters);
 	SetM(nExits);
@@ -11,7 +11,6 @@ LayerCPP::LayerCPP(int nEnters, int nExits, FunctionTypeCPP activationFun)
 
 LayerCPP::~LayerCPP()
 {
-	delete[] x;
 	delete[] y;
 	delete[] ySum;
 	delete[] w0;
@@ -29,8 +28,7 @@ void LayerCPP::Next(float* X)
 {
 	float sum;
 	SetX(X);
-	y = new float[m];
-	ySum = new float[m];
+	
 	for (int i = 0; i < m; i++)
 	{
 		sum = w0[i];
@@ -40,7 +38,7 @@ void LayerCPP::Next(float* X)
 		}
 
 		ySum[i] = sum;
-		y[i] = function.ActivationFunction(sum);
+		y[i] = function->ActivationFunction(sum);
 	}
 }
 
@@ -65,7 +63,7 @@ void LayerCPP::SetN(int N) { n = N; }
 int LayerCPP::GetN() { return n; }
 void LayerCPP::SetM(int M) { m = M; }
 int LayerCPP::GetM() { return m; }
-FunctionWrapperCPP LayerCPP::GetFunction() { return function; }
+FunctionWrapperCPP* LayerCPP::GetFunction() { return function; }
 void LayerCPP::SetX(float* X) { x = X; }
 float* LayerCPP::GetX() { return x; }
 void LayerCPP::SetY(float* Y) { y = Y; }
@@ -84,6 +82,8 @@ float* LayerCPP::GetWn0() { return wn0; }
 void LayerCPP::InitWeights()
 {
 	float limit = sqrtf(6.0f) / sqrtf(n + m);
+	y = new float[m];
+	ySum = new float[m];
 	w = new float*[m];
 	w0 = new float[m];
 	wn = new float*[m];

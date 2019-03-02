@@ -4,7 +4,7 @@
 class FunctionWrapperCPP
 {
 public:
-	FunctionWrapperCPP(FunctionTypeCPP type = Liner);
+	FunctionWrapperCPP(FunctionTypeCPP type);
 	
 	float(*ActivationFunction)(float);
 	float(*DerivativeactivationFunction)(float);

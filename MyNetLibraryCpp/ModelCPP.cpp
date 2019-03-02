@@ -7,14 +7,22 @@ ModelCPP::ModelCPP()
 	SetErrorListLength(500);
 }
 
-void ModelCPP::Train(int maxN, float eta, float*(*getXFunc)(int, int*), float*(*getYFunc)(int, int*))
+ModelCPP::~ModelCPP()
+{
+	for (list<LayerCPP*>::iterator it = layers.begin(); it != layers.end(); ++it)
+	{
+		delete (*it);
+	}
+}
+
+void ModelCPP::Train(int maxN, float eta, float*(*getXFunc)(int), float*(*getYFunc)(int))
 {
 	this->eta = eta;
 	int n;
 	float* inp;
-	int* inpCount;
+	int inpCount;
 	float* outp;
-	int* outpCount;
+	int outpCount;
 	float dW;
 
 	if (random)
@@ -22,9 +30,11 @@ void ModelCPP::Train(int maxN, float eta, float*(*getXFunc)(int, int*), float*(*
 		for (int i = 0; i < maxN; i++)
 		{
 			n = rand();
-			inp = getXFunc(n, inpCount);
-			outp = getYFunc(n, outpCount);
-			TrainStep(inp, *inpCount, outp, *outpCount);
+			inp = getXFunc(n);
+			inpCount = sizeof(inp) / sizeof(float);
+			outp = getYFunc(n);
+			outpCount = sizeof(outp) / sizeof(float);
+			TrainStep(inp, inpCount, outp, outpCount);
 			dW = SetNewW();
 			if (minDWSetted && dW < minDW)
 			{
@@ -42,11 +52,13 @@ void ModelCPP::Train(int maxN, float eta, float*(*getXFunc)(int, int*), float*(*
 		for (int i = 0; i < maxN; i++)
 		{
 			n = 0;
-			inp = getXFunc(n, inpCount);
-			outp = getYFunc(n, outpCount);
+			inp = getXFunc(n);
+			inpCount = sizeof(inp) / sizeof(float);
+			outp = getYFunc(n);
+			outpCount = sizeof(outp) / sizeof(float);
 			do
 			{
-				TrainStep(inp, *inpCount, outp, *outpCount);
+				TrainStep(inp, inpCount, outp, outpCount);
 				if (targetErrorSetted && targetError > lastError)
 				{
 					SetNewW();
@@ -64,8 +76,10 @@ void ModelCPP::Train(int maxN, float eta, float*(*getXFunc)(int, int*), float*(*
 					}
 				}
 
-				inp = getXFunc(n, inpCount);
-				outp = getYFunc(n, outpCount);
+				inp = getXFunc(n);
+				inpCount = sizeof(inp) / sizeof(float);
+				outp = getYFunc(n);
+				outpCount = sizeof(outp) / sizeof(float);
 			} while (i < maxN && inp != NULL && outp != NULL);
 			dW = SetNewW();
 			if (minDWSetted && dW < minDW)
@@ -76,7 +90,7 @@ void ModelCPP::Train(int maxN, float eta, float*(*getXFunc)(int, int*), float*(*
 	}
 }
 
-void ModelCPP::AddLayer(LayerCPP layer)
+void ModelCPP::AddLayer(LayerCPP* layer)
 {
 	layers.push_back(layer);
 	layersCount++;
@@ -85,10 +99,10 @@ void ModelCPP::AddLayer(LayerCPP layer)
 float* ModelCPP::GetRes(float* input)
 {
 	float* temp = input;
-	for (list<LayerCPP>::iterator it = layers.begin(); it != layers.end(); ++it)
+	for (list<LayerCPP*>::iterator it = layers.begin(); it != layers.end(); ++it)
 	{
-		it->Next(temp);
-		temp = it->GetY();
+		(*it)->Next(temp);
+		temp = (*it)->GetY();
 	}
 
 	return temp;
@@ -96,7 +110,7 @@ float* ModelCPP::GetRes(float* input)
 
 void ModelCPP::SaveWeights(string path)
 {
-	ModelSaveLoaderCPP::SaveWeights(layers, layersCount, path);
+	ModelSaveLoaderCPP::SaveWeights(&layers, layersCount, path);
 }
 
 void ModelCPP::LoadWeights(string path)
@@ -125,9 +139,9 @@ list<float> ModelCPP::GetErrorList() { return  errorList; }
 float ModelCPP::SetNewW()
 {
 	float sum = 0;
-	for (list<LayerCPP>::iterator it = layers.begin(); it != layers.end(); ++it)
+	for (list<LayerCPP*>::iterator it = layers.begin(); it != layers.end(); ++it)
 	{
-		sum += it->SetNewW();
+		sum += (*it)->SetNewW();
 	}
 
 	return sum;
@@ -145,7 +159,7 @@ void ModelCPP::TrainStep(float* X, int XCount, float* Y, int YCount)
 	float error = 0;
 	for (int i = 0; i < YCount; i++)
 	{
-		error = powf(layers.back().GetY()[i] - Y[i], 2);
+		error = powf(layers.back()->GetY()[i] - Y[i], 2);
 	}
 
 	lastError = error / YCount;
@@ -169,7 +183,7 @@ void ModelCPP::TrainStep(float* X, int XCount, float* Y, int YCount)
 			sum = 0;
 			if (ind == layersCount - 1)
 			{
-				dels[j] = (Y[j] - it->GetY()[j]) * it->GetFunction().DerivativeactivationFunction(it->GetYsum()[j]);
+				dels[j] = (Y[j] - it->GetY()[j]) * it->GetFunction()->DerivativeactivationFunction(it->GetYsum()[j]);
 			}
 			else
 			{
@@ -180,7 +194,7 @@ void ModelCPP::TrainStep(float* X, int XCount, float* Y, int YCount)
 					sum += itn->GetW()[k][j] * delsOld[k];
 				}
 
-				dels[j] = sum * it->GetFunction().DerivativeactivationFunction(it->GetYsum()[j]);
+				dels[j] = sum * it->GetFunction()->DerivativeactivationFunction(it->GetYsum()[j]);
 			}
 
 			for (int k = 0; k < it->GetN(); k++)

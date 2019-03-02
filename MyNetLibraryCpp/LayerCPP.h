@@ -4,7 +4,7 @@
 class LayerCPP
 {
 public:
-	LayerCPP(int nEnters, int nExits, FunctionTypeCPP activationFun);
+	LayerCPP(int nEnters, int nExits, FunctionWrapperCPP* activationFun);
 
 	~LayerCPP();
 
@@ -17,7 +17,7 @@ public:
 	int GetN();
 	void SetM(int M);
 	int GetM();
-	FunctionWrapperCPP GetFunction();
+	FunctionWrapperCPP* GetFunction();
 	void SetX(float* X);
 	float* GetX();
 	void SetY(float* Y);
@@ -36,7 +36,7 @@ public:
 private:
 	int n;
 	int m;
-	FunctionWrapperCPP function;
+	FunctionWrapperCPP* function;
 	float* x;
 	float* y;
 	float* ySum;

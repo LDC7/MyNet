@@ -30,6 +30,12 @@
     <ClInclude Include="ModelSaveLoader.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="FunctionTypeWrapper.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="FloatDelegateToFunctionWrapper.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MyNetLibraryCppWrapper.cpp">

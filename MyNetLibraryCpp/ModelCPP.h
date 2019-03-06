@@ -1,5 +1,6 @@
 #pragma once
 #include "ModelSaveLoaderCPP.h"
+#include <functional>
 
 class ModelCPP
 {
@@ -8,7 +9,7 @@ public:
 
 	~ModelCPP();
 	
-	void Train(int maxN, float eta, float*(*getXFunc)(int), float*(*getYFunc)(int));
+	void Train(int maxN, float eta, std::function<float*(int)> getXFunc, std::function<float*(int)> getYFunc);
 
 	void AddLayer(LayerCPP* layer);
 

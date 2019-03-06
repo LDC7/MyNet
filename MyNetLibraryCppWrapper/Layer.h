@@ -1,8 +1,6 @@
-// Layer.h
-
 #pragma once
 #include "LayerCPP.h"
-#include "FunctionWrapperCPP.h"
+#include "FunctionTypeWrapper.h"
 
 namespace MyNetLibraryCppWrapper {
 
@@ -23,6 +21,20 @@ namespace MyNetLibraryCppWrapper {
 
 		!Layer()
 		{
+			if (funcWrap != nullptr )
+			{
+				delete funcWrap;
+				funcWrap = nullptr;
+			}
+			if (layer != nullptr)
+			{
+				delete layer;
+				layer = nullptr;
+			}
+		}
+
+		~Layer()
+		{
 			delete funcWrap;
 			delete layer;
 		}
@@ -32,14 +44,5 @@ namespace MyNetLibraryCppWrapper {
 		{
 			return layer;
 		}
-	};
-
-	public enum FunctionType
-	{
-		Liner,
-		BynarySigmoid,
-		BipolarSigmoid,
-		GyperTan,
-		ReLu
 	};
 }

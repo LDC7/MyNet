@@ -9,9 +9,49 @@
     {
         static void Main(string[] args)
         {
-            MNCPP.Layer l = new MNCPP.Layer();
-            Console.WriteLine(l.kek());
+            MNCPP.Model model = new MNCPP.Model();
+
+            model.AddLayer(new MNCPP.Layer(2, 2, MNCPP.FunctionType.BynarySigmoid));
+            model.AddLayer(new MNCPP.Layer(2, 1, MNCPP.FunctionType.BynarySigmoid));
+
+            var l0 = new MNCPP.FloatArrayPointer(2); l0.SetValue(0, 0.0f); l0.SetValue(1, 0.0f);
+            var l1 = new MNCPP.FloatArrayPointer(2); l0.SetValue(0, 0.0f); l0.SetValue(1, 1.0f);
+            var l2 = new MNCPP.FloatArrayPointer(2); l0.SetValue(0, 1.0f); l0.SetValue(1, 0.0f);
+            var l3 = new MNCPP.FloatArrayPointer(2); l0.SetValue(0, 1.0f); l0.SetValue(1, 1.0f);
+            List<MNCPP.FloatArrayPointer> inp = new List<MNCPP.FloatArrayPointer>(4)
+            {
+                l0,
+                l1,
+                l2,
+                l3
+            };
+            var o0 = new MNCPP.FloatArrayPointer(1); l0.SetValue(0, 0.0f);
+            var o1 = new MNCPP.FloatArrayPointer(1); l0.SetValue(0, 1.0f);
+            var o2 = new MNCPP.FloatArrayPointer(1); l0.SetValue(0, 1.0f);
+            var o3 = new MNCPP.FloatArrayPointer(1); l0.SetValue(0, 0.0f);
+            List<MNCPP.FloatArrayPointer> outL = new List<MNCPP.FloatArrayPointer>(4)
+            {
+                o0,
+                o1,
+                o2,
+                o3
+            };
+            
+            Func<int, MNCPP.FloatArrayPointer> fInp = (x => inp[x % inp.Count]);
+            Func<int, MNCPP.FloatArrayPointer> fOut = (x => outL[x % outL.Count]);
+
+            model.Train(10000, 0.01f, fInp, fOut);
+
+            Console.WriteLine("TRAIN DONE");
+            Console.WriteLine($"0 xor 0 = {model.GetRes(l0).GetValue(0)}");
+            Console.WriteLine($"0 xor 1 = {model.GetRes(l1).GetValue(0)}");
+            Console.WriteLine($"1 xor 0 = {model.GetRes(l2).GetValue(0)}");
+            Console.WriteLine($"1 xor 1 = {model.GetRes(l3).GetValue(0)}");
+            Console.WriteLine("DONE");
+            model.SaveWeights("res.txt");
+
             Console.ReadKey();
+
 
             //Model model = new Model();
 

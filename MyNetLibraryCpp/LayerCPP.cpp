@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "LayerCPP.h"
+#include <cmath>
 
 LayerCPP::LayerCPP(int nEnters, int nExits, FunctionWrapperCPP* activationFun)
 {

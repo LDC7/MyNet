@@ -15,7 +15,7 @@ ModelCPP::~ModelCPP()
 	}
 }
 
-void ModelCPP::Train(int maxN, float eta, float*(*getXFunc)(int), float*(*getYFunc)(int))
+void ModelCPP::Train(int maxN, float eta, std::function<float*(int)> getXFunc, std::function<float*(int)> getYFunc)
 {
 	this->eta = eta;
 	int n;
@@ -24,6 +24,14 @@ void ModelCPP::Train(int maxN, float eta, float*(*getXFunc)(int), float*(*getYFu
 	float* outp;
 	int outpCount;
 	float dW;
+
+	momentum = new float*[layersCount];
+	int ind = layersCount - 1;
+	for (list<LayerCPP*>::reverse_iterator it = layers.rbegin(); it != layers.rend(); ++it)
+	{
+		momentum[ind] = new float[(*it)->GetM()]();
+		ind--;
+	}
 
 	if (random)
 	{
@@ -88,6 +96,12 @@ void ModelCPP::Train(int maxN, float eta, float*(*getXFunc)(int), float*(*getYFu
 			}
 		}
 	}
+
+	for (int i = 0; i < layersCount; i++)
+	{
+		delete[] momentum[i];
+	}
+	delete[] momentum;
 }
 
 void ModelCPP::AddLayer(LayerCPP* layer)
@@ -154,7 +168,7 @@ void ModelCPP::TrainStep(float* X, int XCount, float* Y, int YCount)
 	float* dels;
 	float* delsOld = NULL;
 	float temp;
-	momentum = new float*[layersCount];
+	
 
 	float error = 0;
 	for (int i = 0; i < YCount; i++)
@@ -171,51 +185,45 @@ void ModelCPP::TrainStep(float* X, int XCount, float* Y, int YCount)
 		errorList.erase(errorList.begin(), it);
 	}
 
-	list<LayerCPP>::reverse_iterator itn;
+	list<LayerCPP*>::reverse_iterator itn;
 	int ind = layersCount - 1;
-	for (list<LayerCPP>::reverse_iterator it = layers.rbegin(); it != layers.rend(); ++it)
+	for (list<LayerCPP*>::reverse_iterator it = layers.rbegin(); it != layers.rend(); ++it)
 	{
-		dels = new float[it->GetM()];
-		momentum[ind] = new float[it->GetM()];
+		dels = new float[(*it)->GetM()];
 
-		for (int j = 0; j < it->GetM(); j++)
+		for (int j = 0; j < (*it)->GetM(); j++)
 		{
 			sum = 0;
 			if (ind == layersCount - 1)
 			{
-				dels[j] = (Y[j] - it->GetY()[j]) * it->GetFunction()->DerivativeactivationFunction(it->GetYsum()[j]);
+				dels[j] = (Y[j] - (*it)->GetY()[j]) * (*it)->GetFunction()->DerivativeactivationFunction((*it)->GetYsum()[j]);
 			}
 			else
 			{
 				itn = it;
 				itn--;
-				for (int k = 0; k < itn->GetM(); k++)
+				for (int k = 0; k < (*itn)->GetM(); k++)
 				{
-					sum += itn->GetW()[k][j] * delsOld[k];
+					sum += (*itn)->GetW()[k][j] * delsOld[k];
 				}
 
-				dels[j] = sum * it->GetFunction()->DerivativeactivationFunction(it->GetYsum()[j]);
+				dels[j] = sum * (*it)->GetFunction()->DerivativeactivationFunction((*it)->GetYsum()[j]);
 			}
 
-			for (int k = 0; k < it->GetN(); k++)
+			for (int k = 0; k < (*it)->GetN(); k++)
 			{
-				temp = it->GetX()[k] * eta * dels[j];
-				it->GetWn()[j][k] += temp - (lambdaReg * it->GetWn()[j][k]) + (momentumCoefficient * momentum[ind][j]);
+				temp = (*it)->GetX()[k] * eta * dels[j];
+				(*it)->GetWn()[j][k] += temp - (lambdaReg * (*it)->GetWn()[j][k]) + (momentumCoefficient * momentum[ind][j]);
 				momentum[ind][j] = temp;
 			}
 
-			it->GetWn0()[j] += eta * dels[j] - (lambdaReg * it->GetWn0()[j]);
+			(*it)->GetWn0()[j] += eta * dels[j] - (lambdaReg * (*it)->GetWn0()[j]);
 		}
 
 		delete[] delsOld;
 		delsOld = dels;
-		ind++;
+		ind--;
 	}
 
-	for (int i = 0; i < layersCount; i++)
-	{
-		delete[] momentum[i];
-	}
-	delete[] delsOld;
-	delete[] momentum;
+	delete[] delsOld;	
 }

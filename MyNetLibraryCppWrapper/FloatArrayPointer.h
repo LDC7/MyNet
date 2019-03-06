@@ -34,6 +34,15 @@ namespace MyNetLibraryCppWrapper {
 
 		!FloatArrayPointer()
 		{
+			if (arr != nullptr)
+			{
+				delete[] arr;
+				arr = nullptr;
+			}
+		}
+
+		~FloatArrayPointer()
+		{
 			delete[] arr;
 		}
 
@@ -45,6 +54,16 @@ namespace MyNetLibraryCppWrapper {
 		void SetValue(int i, float val)
 		{
 			arr[i] = val;
+		}
+
+		float GetValue(int i)
+		{
+			if (i < size && i >= 0)
+			{
+				return arr[i];
+			}
+
+			return 0;
 		}
 	};
 }

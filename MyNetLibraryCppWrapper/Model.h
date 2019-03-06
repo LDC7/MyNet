@@ -3,6 +3,9 @@
 #include "ModelSaveLoader.h"
 #include "Layer.h"
 #include "FloatArrayPointer.h"
+#include "FloatDelegateToFunctionWrapper.h"
+#include <functional>
+#include <vcclr.h>
 
 namespace MyNetLibraryCppWrapper {
 
@@ -10,27 +13,10 @@ namespace MyNetLibraryCppWrapper {
 	using namespace System::Collections::Generic;
 	using namespace std;
 
-	private delegate FloatArrayPointer^ inputDelegate(int n);
-	private delegate FloatArrayPointer^ outputDelegate(int n);
-
 	public ref class Model
 	{
 	private:
 		ModelCPP* model;
-		inputDelegate^ inputFunction;
-		outputDelegate^ outputFunction;
-
-		float* inpDelToPtr(int n)
-		{
-			float* res = inputFunction->Invoke(n)->GetPointer();			
-			return res;
-		}
-
-		float* outpDelToPtr(int n)
-		{
-			float* res = outputFunction->Invoke(n)->GetPointer();
-			return res;
-		};
 
 	public:
 		Model()
@@ -40,17 +26,19 @@ namespace MyNetLibraryCppWrapper {
 
 		!Model()
 		{
-			delete model;
+			if (model != nullptr)
+			{
+				delete model;
+				model = nullptr;
+			}
 		}
 
-		void Train(int maxN, float eta, inputDelegate^ inpFunc, outputDelegate^ outFunc)
-		{
-			inputFunction = inpFunc;
-			outputFunction = outFunc;
-			float*(*inp_ptr)(int) = this->inpDelToPtr;
-			float*(*outp_ptr)(int) = this->outpDelToPtr;
-
-			model->Train(maxN, eta, inp_ptr, outp_ptr);
+		void Train(int maxN, float eta, Func<int, FloatArrayPointer^>^ inpFunc, Func<int, FloatArrayPointer^>^ outFunc)
+		{			
+			model->Train(maxN,
+				eta,
+				FloatDelegateToFunctionWrapper::GetFunction(inpFunc),
+				FloatDelegateToFunctionWrapper::GetFunction(outFunc));
 		}
 
 		void AddLayer(Layer^ layer)

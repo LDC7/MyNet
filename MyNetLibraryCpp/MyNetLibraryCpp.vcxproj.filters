@@ -33,9 +33,6 @@
     <ClInclude Include="ModelCPP.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="ModelSaveLoaderCPP.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
@@ -51,9 +48,6 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="ModelCPP.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="ModelSaveLoaderCPP.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>

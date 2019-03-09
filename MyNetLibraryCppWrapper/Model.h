@@ -63,5 +63,95 @@ namespace MyNetLibraryCppWrapper {
 		{
 			ModelSaveLoader::LoadWeights(model, path);
 		}
+
+		// ÑÂÎÉÑÒÂÀ
+
+		void SetTargetError(float targetError)
+		{
+			model->SetTargetError(targetError);
+		}
+
+		float GetTargetError()
+		{
+			return model->GetTargetError();
+		}
+
+		void SetMinDW(float minDW)
+		{
+			model->SetMinDW(minDW);
+		}
+
+		float GetMinDW()
+		{
+			return model->GetMinDW();
+		}
+
+		void SetBatchSize(int batchSize)
+		{
+			model->SetBatchSize(batchSize);
+		}
+
+		int GetBatchSize()
+		{
+			return model->GetBatchSize();
+		}
+
+		void SetRandom(bool random)
+		{
+			model->SetRandom(random);
+		}
+
+		bool GetRandom()
+		{
+			return model->GetRandom();
+		}
+
+		void SetMomentumCoefficient(float momentumCoefficient)
+		{
+			model->SetMomentumCoefficient(momentumCoefficient);
+		}
+
+		float GetMomentumCoefficient()
+		{
+			return model->GetMomentumCoefficient();
+		}
+
+		void SetErrorListLength(int errorListLength)
+		{
+			model->SetErrorListLength(errorListLength);
+		}
+
+		int GetErrorListLength()
+		{
+			return model->GetErrorListLength();
+		}
+
+		void SetLambdaReg(float lambdaReg)
+		{
+			model->SetLambdaReg(lambdaReg);
+		}
+
+		float GetLambdaReg()
+		{
+			return model->GetLambdaReg();
+		}
+
+		List<float>^ GetErrorList()
+		{
+			List<float>^ res = gcnew List<float>();
+			list<float>* l = &model->GetErrorList();
+
+			for (list<float>::iterator it = l->begin(); it != l->end(); it++)
+			{
+				res->Add(*it);
+			}
+
+			return res;
+		}
+
+		int GetLayersCount()
+		{
+			return model->GetLayersCount();
+		}
 	};
 }

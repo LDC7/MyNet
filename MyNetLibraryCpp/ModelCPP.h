@@ -1,6 +1,9 @@
 #pragma once
-#include "ModelSaveLoaderCPP.h"
+#include "LayerCPP.h"
 #include <functional>
+#include <list>
+
+using namespace std;
 
 class ModelCPP
 {
@@ -14,10 +17,6 @@ public:
 	void AddLayer(LayerCPP* layer);
 
 	float* GetRes(float* input);
-
-	void SaveWeights(string path);
-
-	void LoadWeights(string path);
 
 	// Свойства
 	void SetTargetError(float TargetError);
@@ -34,8 +33,9 @@ public:
 	int GetErrorListLength();
 	void SetLambdaReg(float LambdaReg);
 	float GetLambdaReg();
-	void SetErrorList(list<float> ErrorList);
 	list<float> GetErrorList();
+	int GetLayersCount();
+	list<LayerCPP*> GetLayers();
 
 private:
 	list<LayerCPP*> layers;

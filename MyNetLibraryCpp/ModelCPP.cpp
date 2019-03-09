@@ -122,16 +122,6 @@ float* ModelCPP::GetRes(float* input)
 	return temp;
 }
 
-void ModelCPP::SaveWeights(string path)
-{
-	ModelSaveLoaderCPP::SaveWeights(&layers, layersCount, path);
-}
-
-void ModelCPP::LoadWeights(string path)
-{
-	ModelSaveLoaderCPP::LoadWeights(&layers, path);
-}
-
 // Свойства
 void ModelCPP::SetTargetError(float TargetError) { targetErrorSetted = true; targetError = TargetError; }
 float ModelCPP::GetTargetError() { return targetErrorSetted ? targetError : -1.0f; }
@@ -147,8 +137,9 @@ void ModelCPP::SetErrorListLength(int ErrorListLength) { errorListLength = Error
 int ModelCPP::GetErrorListLength() { return errorListLength; }
 void ModelCPP::SetLambdaReg(float LambdaReg) { lambdaReg = LambdaReg; }
 float ModelCPP::GetLambdaReg() { return lambdaReg; }
-void ModelCPP::SetErrorList(list<float> ErrorList) { errorList = ErrorList; }
 list<float> ModelCPP::GetErrorList() { return  errorList; }
+int ModelCPP::GetLayersCount() { return layersCount; }
+list<LayerCPP*> ModelCPP::GetLayers() { return layers; }
 
 float ModelCPP::SetNewW()
 {

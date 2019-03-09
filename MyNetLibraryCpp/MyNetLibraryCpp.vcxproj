@@ -154,7 +154,6 @@
     <ClInclude Include="FunctionWrapperCPP.h" />
     <ClInclude Include="LayerCPP.h" />
     <ClInclude Include="ModelCPP.h" />
-    <ClInclude Include="ModelSaveLoaderCPP.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -163,7 +162,6 @@
     <ClCompile Include="FunctionWrapperCPP.cpp" />
     <ClCompile Include="LayerCPP.cpp" />
     <ClCompile Include="ModelCPP.cpp" />
-    <ClCompile Include="ModelSaveLoaderCPP.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -14,6 +14,8 @@
             model.AddLayer(new MNCPP.Layer(2, 2, MNCPP.FunctionType.BynarySigmoid));
             model.AddLayer(new MNCPP.Layer(2, 1, MNCPP.FunctionType.BynarySigmoid));
 
+            model.SaveWeights("res.txt");
+
             var l0 = new MNCPP.FloatArrayPointer(2); l0.SetValue(0, 0.0f); l0.SetValue(1, 0.0f);
             var l1 = new MNCPP.FloatArrayPointer(2); l0.SetValue(0, 0.0f); l0.SetValue(1, 1.0f);
             var l2 = new MNCPP.FloatArrayPointer(2); l0.SetValue(0, 1.0f); l0.SetValue(1, 0.0f);
@@ -36,9 +38,14 @@
                 o2,
                 o3
             };
-            
+
+            model.SetRandom(true);
             Func<int, MNCPP.FloatArrayPointer> fInp = (x => inp[x % inp.Count]);
             Func<int, MNCPP.FloatArrayPointer> fOut = (x => outL[x % outL.Count]);
+
+            model.SetLambdaReg(0.0f);
+            model.SetMomentumCoefficient(0.01f);
+
 
             model.Train(10000, 0.01f, fInp, fOut);
 
@@ -48,9 +55,10 @@
             Console.WriteLine($"1 xor 0 = {model.GetRes(l2).GetValue(0)}");
             Console.WriteLine($"1 xor 1 = {model.GetRes(l3).GetValue(0)}");
             Console.WriteLine("DONE");
-            model.SaveWeights("res.txt");
+            //model.SaveWeights("res.txt");
 
             Console.ReadKey();
+
 
 
             //Model model = new Model();

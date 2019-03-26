@@ -12,7 +12,7 @@ public:
 
 	~ModelCPP();
 	
-	void Train(int maxN, float eta, std::function<float*(int)> getXFunc, std::function<float*(int)> getYFunc);
+	void Train(int maxN, float eta, std::function<float*(int)> getXFunc, int inpCount, std::function<float*(int)> getYFunc, int outpCount);
 
 	void AddLayer(LayerCPP* layer);
 
@@ -35,10 +35,10 @@ public:
 	float GetLambdaReg();
 	list<float> GetErrorList();
 	int GetLayersCount();
-	list<LayerCPP*> GetLayers();
+	list<LayerCPP*>* GetLayers();
 
 private:
-	list<LayerCPP*> layers;
+	list<LayerCPP*>* layers;
 	int layersCount = 0;
 	float eta;
 	float** momentum;

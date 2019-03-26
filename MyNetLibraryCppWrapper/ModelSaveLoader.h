@@ -12,6 +12,7 @@ namespace MyNetLibraryCppWrapper {
 	internal:
 		static void SaveWeights(ModelCPP* model, System::String^ path)
 		{
+			StringBuilder^ sb;
 			FileStream^ fs = gcnew FileStream(path, FileMode::OpenOrCreate);
 			StreamWriter^ writer;
 			try
@@ -21,19 +22,23 @@ namespace MyNetLibraryCppWrapper {
 				int layersCount = model->GetLayersCount();
 				writer->WriteLine(layersCount);
 
-				list<LayerCPP*>* layers = &model->GetLayers();
+				list<LayerCPP*>* layers = model->GetLayers();
 				for (list<LayerCPP*>::iterator it = layers->begin(); it != layers->end(); it++)
 				{
-					writer->Write((*it)->GetN());
-					writer->Write(" ");
-					writer->WriteLine((*it)->GetM());
-
 					int M = (*it)->GetM();
 					int N = (*it)->GetN();
-					StringBuilder^ sb;
+
+					sb = gcnew StringBuilder();
+					sb->Append(N);
+					sb->Append(" ");
+					sb->Append(M);
+
+					writer->WriteLine(sb->ToString());		
+					
 					for (int i = 0; i < M; i++)
 					{
-						sb = gcnew StringBuilder((*it)->GetW0()[i]);
+						sb = gcnew StringBuilder();
+						sb->Append((*it)->GetW0()[i]);
 						sb->Append(" ");
 						for (int j = 0; j < N; j++)
 						{
@@ -77,7 +82,7 @@ namespace MyNetLibraryCppWrapper {
 			}
 
 			wchar_t wchSpace = L' ';
-			auto layers = &model->GetLayers();
+			auto layers = model->GetLayers();
 			int l = 1;
 			for (auto it = layers->begin(); it != layers->end(); it++)
 			{

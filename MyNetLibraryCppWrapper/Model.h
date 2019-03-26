@@ -33,12 +33,14 @@ namespace MyNetLibraryCppWrapper {
 			}
 		}
 
-		void Train(int maxN, float eta, Func<int, FloatArrayPointer^>^ inpFunc, Func<int, FloatArrayPointer^>^ outFunc)
+		void Train(int maxN, float eta, Func<int, FloatArrayPointer^>^ inpFunc, int inputCount, Func<int, FloatArrayPointer^>^ outFunc, int outputCount)
 		{			
 			model->Train(maxN,
 				eta,
 				FloatDelegateToFunctionWrapper::GetFunction(inpFunc),
-				FloatDelegateToFunctionWrapper::GetFunction(outFunc));
+				inputCount,
+				FloatDelegateToFunctionWrapper::GetFunction(outFunc),
+				outputCount);
 		}
 
 		void AddLayer(Layer^ layer)
@@ -139,9 +141,9 @@ namespace MyNetLibraryCppWrapper {
 		List<float>^ GetErrorList()
 		{
 			List<float>^ res = gcnew List<float>();
-			list<float>* l = &model->GetErrorList();
+			list<float> l = model->GetErrorList();
 
-			for (list<float>::iterator it = l->begin(); it != l->end(); it++)
+			for (list<float>::iterator it = l.begin(); it != l.end(); it++)
 			{
 				res->Add(*it);
 			}

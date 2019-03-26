@@ -98,7 +98,7 @@ void LayerCPP::InitWeights()
 			w[i][j] = (float)(((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * (2 * limit)) - limit);
 			wn[i][j] = w[i][j];
 		}
-		w0[i] = 0;
-		wn0[i] = 0;
+		w0[i] = 0.0f;
+		wn0[i] = 0.0f;
 	}
 }

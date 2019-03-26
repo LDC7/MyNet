@@ -5,29 +5,29 @@ ModelCPP::ModelCPP()
 {
 	SetMomentumCoefficient(0.1f);
 	SetErrorListLength(500);
+	layers = new list<LayerCPP*>();
 }
 
 ModelCPP::~ModelCPP()
 {
-	for (list<LayerCPP*>::iterator it = layers.begin(); it != layers.end(); ++it)
+	for (list<LayerCPP*>::iterator it = layers->begin(); it != layers->end(); it++)
 	{
 		delete (*it);
 	}
+	delete layers;
 }
 
-void ModelCPP::Train(int maxN, float eta, std::function<float*(int)> getXFunc, std::function<float*(int)> getYFunc)
+void ModelCPP::Train(int maxN, float eta, std::function<float*(int)> getXFunc, int inpCount, std::function<float*(int)> getYFunc, int outpCount)
 {
 	this->eta = eta;
 	int n;
 	float* inp;
-	int inpCount;
 	float* outp;
-	int outpCount;
 	float dW;
 
 	momentum = new float*[layersCount];
 	int ind = layersCount - 1;
-	for (list<LayerCPP*>::reverse_iterator it = layers.rbegin(); it != layers.rend(); ++it)
+	for (list<LayerCPP*>::reverse_iterator it = layers->rbegin(); it != layers->rend(); it++)
 	{
 		momentum[ind] = new float[(*it)->GetM()]();
 		ind--;
@@ -39,9 +39,7 @@ void ModelCPP::Train(int maxN, float eta, std::function<float*(int)> getXFunc, s
 		{
 			n = rand();
 			inp = getXFunc(n);
-			inpCount = sizeof(inp) / sizeof(float);
 			outp = getYFunc(n);
-			outpCount = sizeof(outp) / sizeof(float);
 			TrainStep(inp, inpCount, outp, outpCount);
 			dW = SetNewW();
 			if (minDWSetted && dW < minDW)
@@ -57,13 +55,11 @@ void ModelCPP::Train(int maxN, float eta, std::function<float*(int)> getXFunc, s
 	}
 	else
 	{
-		for (int i = 0; i < maxN; i++)
+		for (int i = 0; i < maxN;)
 		{
 			n = 0;
 			inp = getXFunc(n);
-			inpCount = sizeof(inp) / sizeof(float);
 			outp = getYFunc(n);
-			outpCount = sizeof(outp) / sizeof(float);
 			do
 			{
 				TrainStep(inp, inpCount, outp, outpCount);
@@ -85,9 +81,7 @@ void ModelCPP::Train(int maxN, float eta, std::function<float*(int)> getXFunc, s
 				}
 
 				inp = getXFunc(n);
-				inpCount = sizeof(inp) / sizeof(float);
 				outp = getYFunc(n);
-				outpCount = sizeof(outp) / sizeof(float);
 			} while (i < maxN && inp != NULL && outp != NULL);
 			dW = SetNewW();
 			if (minDWSetted && dW < minDW)
@@ -106,14 +100,14 @@ void ModelCPP::Train(int maxN, float eta, std::function<float*(int)> getXFunc, s
 
 void ModelCPP::AddLayer(LayerCPP* layer)
 {
-	layers.push_back(layer);
+	layers->push_back(layer);
 	layersCount++;
 }
 
 float* ModelCPP::GetRes(float* input)
 {
 	float* temp = input;
-	for (list<LayerCPP*>::iterator it = layers.begin(); it != layers.end(); ++it)
+	for (list<LayerCPP*>::iterator it = layers->begin(); it != layers->end(); it++)
 	{
 		(*it)->Next(temp);
 		temp = (*it)->GetY();
@@ -139,12 +133,12 @@ void ModelCPP::SetLambdaReg(float LambdaReg) { lambdaReg = LambdaReg; }
 float ModelCPP::GetLambdaReg() { return lambdaReg; }
 list<float> ModelCPP::GetErrorList() { return  errorList; }
 int ModelCPP::GetLayersCount() { return layersCount; }
-list<LayerCPP*> ModelCPP::GetLayers() { return layers; }
+list<LayerCPP*>* ModelCPP::GetLayers() { return layers; }
 
 float ModelCPP::SetNewW()
 {
 	float sum = 0;
-	for (list<LayerCPP*>::iterator it = layers.begin(); it != layers.end(); ++it)
+	for (list<LayerCPP*>::iterator it = layers->begin(); it != layers->end(); it++)
 	{
 		sum += (*it)->SetNewW();
 	}
@@ -156,15 +150,14 @@ void ModelCPP::TrainStep(float* X, int XCount, float* Y, int YCount)
 {
 	float sum;
 	GetRes(X);
-	float* dels;
+	float* dels = NULL;
 	float* delsOld = NULL;
-	float temp;
-	
+	float temp;	
 
 	float error = 0;
 	for (int i = 0; i < YCount; i++)
 	{
-		error = powf(layers.back()->GetY()[i] - Y[i], 2);
+		error += powf(layers->back()->GetY()[i] - Y[i], 2);
 	}
 
 	lastError = error / YCount;
@@ -178,7 +171,7 @@ void ModelCPP::TrainStep(float* X, int XCount, float* Y, int YCount)
 
 	list<LayerCPP*>::reverse_iterator itn;
 	int ind = layersCount - 1;
-	for (list<LayerCPP*>::reverse_iterator it = layers.rbegin(); it != layers.rend(); ++it)
+	for (list<LayerCPP*>::reverse_iterator it = layers->rbegin(); it != layers->rend(); it++)
 	{
 		dels = new float[(*it)->GetM()];
 
@@ -216,5 +209,5 @@ void ModelCPP::TrainStep(float* X, int XCount, float* Y, int YCount)
 		ind--;
 	}
 
-	delete[] delsOld;	
+	delete[] dels;
 }

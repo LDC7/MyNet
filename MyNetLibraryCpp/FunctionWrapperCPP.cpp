@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "FunctionWrapperCPP.h"
 #include <cmath>
-using namespace std;
 
 
 float LinerFun(float x) { return x; }
@@ -29,24 +28,34 @@ void FunctionWrapperCPP::choseFun(FunctionTypeCPP activationFun)
 	switch (activationFun)
 	{
 	case Liner:
-		ActivationFunction = LinerFun;
-		DerivativeactivationFunction = DerLinerFun;
+		actFun = LinerFun;
+		deactFun = DerLinerFun;
 		break;
 	case BynarySigmoid:
-		ActivationFunction = BynarySigmoidFun;
-		DerivativeactivationFunction = DerBynarySigmoidFun;
+		actFun = BynarySigmoidFun;
+		deactFun = DerBynarySigmoidFun;
 		break;
 	case BipolarSigmoid:
-		ActivationFunction = BipolarSigmoidFun;
-		DerivativeactivationFunction = DerBipolarSigmoidFun;
+		actFun = BipolarSigmoidFun;
+		deactFun = DerBipolarSigmoidFun;
 		break;
 	case GyperTan:
-		ActivationFunction = GyperTanFun;
-		DerivativeactivationFunction = DerGyperTanFun;
+		actFun = GyperTanFun;
+		deactFun = DerGyperTanFun;
 		break;
 	case ReLu:
-		ActivationFunction = ReLuFun;
-		DerivativeactivationFunction = DerReLuFun;
+		actFun = ReLuFun;
+		deactFun = DerReLuFun;
 		break;
 	}
+}
+
+float FunctionWrapperCPP::ActivationFunction(float x)
+{
+	return actFun(x);
+}
+
+float FunctionWrapperCPP::DerivativeactivationFunction(float x)
+{
+	return deactFun(x);
 }

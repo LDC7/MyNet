@@ -55,7 +55,7 @@
             }
             else
             {
-                for (int i = 0; i < maxN; i++)
+                for (int i = 0; i < maxN;)
                 {
                     n = 0;
                     inp = getXFunc(n);
